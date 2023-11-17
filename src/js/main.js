@@ -228,14 +228,12 @@ window.addEventListener("DOMContentLoaded", () => {
     item.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      let valid = false;
+      let valid = true;
       const name = item.querySelector(".name"),
         err = item.querySelector(".name_error");
 
       err.style.color = "red";
       err.classList.add("hide");
-
-      err.textContent = "";
 
       if (/\d/.test(name.value)) {
         err.textContent = "Имя не должно содержать цифры";
@@ -248,10 +246,6 @@ window.addEventListener("DOMContentLoaded", () => {
         err.classList.remove("hide");
         valid = false;
       }
-
-      if (!/\d/.test(name.value) && name.value.length >= 2) {
-        valid = true;
-      }
       if (valid) {
         postData(item);
       }
@@ -260,41 +254,35 @@ window.addEventListener("DOMContentLoaded", () => {
 
   //Функция для отправки формы
   function postData(form) {
-    form.addEventListener("submit", (e) => {
-      // e.preventDefault();
-
-      let statusMessage = document.createElement("img");
-      statusMessage.src = message.loading;
-      statusMessage.style.cssText = `
+    let statusMessage = document.createElement("img");
+    statusMessage.src = message.loading;
+    statusMessage.style.cssText = `
         display: block;
         margin: 0 auto;
       `;
-      form.insertAdjacentElement("afterend", statusMessage);
+    form.insertAdjacentElement("afterend", statusMessage);
 
-      const request = new XMLHttpRequest();
-      request.open("POST", "../server.php");
-      request.setRequestHeader(
-        "Content-type",
-        "application/json; charset=utf-8"
-      );
-      const formData = new FormData(form);
+    const request = new XMLHttpRequest();
+    request.open("POST", "../server.php");
+    request.setRequestHeader("Content-type", "application/json; charset=utf-8");
+    const formData = new FormData(form);
 
-      const object = {};
-      formData.forEach(function (value, key) {
-        object[key] = value;
-      });
-      request.send(JSON.stringify(object));
+    const object = {};
+    formData.forEach(function (value, key) {
+      object[key] = value;
+    });
+    request.send(JSON.stringify(object));
 
-      request.addEventListener("load", () => {
-        if (request.status === 200) {
-          console.log(request.response);
-          showThanksModal(message.success);
-          statusMessage.remove();
-          form.reset();
-        } else {
-          showThanksModal(message.fail);
-        }
-      });
+    request.addEventListener("load", () => {
+      if (request.status === 200) {
+        console.log(request.response);
+
+        statusMessage.remove();
+        form.reset();
+        showThanksModal(message.success);
+      } else {
+        showThanksModal(message.fail);
+      }
     });
   }
 

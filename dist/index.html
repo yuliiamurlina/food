@@ -212,7 +212,8 @@
         <div class="container">
             <div class="title">Заказывай пробный день прямо сейчас!</div>
             <form action="#" class="order__form">
-                <input required placeholder="Ваше имя" name="name" type="text" class="order__input">
+                <input required placeholder="Ваше имя" name="name" type="text" class="order__input name">
+                <div class="name_error"></div>
                 <input required placeholder="Ваш номер телефона" name="phone" class="order__input">
                 <img src="icons/right.svg" alt="right">
                 <button class="btn btn_dark btn_min">Перезвонить мне</button>
@@ -283,6 +284,7 @@
                     <div data-modalclose class="modal__close">&times;</div>
                     <div class="modal__title">Мы свяжемся с вами как можно быстрее!</div>
                     <input required placeholder="Ваше имя" name="name" type="text" class="modal__input name">
+                    <div class="name_error"></div>
                     <input required placeholder="Ваш номер телефона" name="phone" class="modal__input phone">
                     <button class="btn btn_dark btn_min">Перезвонить мне</button>
                 </form>

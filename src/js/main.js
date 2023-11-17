@@ -123,7 +123,6 @@ window.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = "hidden";
     clearInterval(modalTimerId);
     wasModalOpened = true;
-    err.remove();
   }
 
   function closeModal() {
@@ -221,77 +220,48 @@ window.addEventListener("DOMContentLoaded", () => {
       success: "Спасибо! Скоро мы с вами свяжемся",
       fail: "Произошла ошибка",
       loading: "img/spinner.svg",
-    },
-    err = document.createElement("div");
-  let isErrorValidationMessage = false;
+    };
+
+  $("input[name=phone]").mask("+38 (999) 999-99-99");
 
   forms.forEach((item) => {
     item.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      let error = validation(item);
-      if (error === 0) {
+      let valid = false;
+      const name = item.querySelector(".name"),
+        err = item.querySelector(".name_error");
+
+      err.style.color = "red";
+      err.classList.add("hide");
+
+      err.textContent = "";
+
+      if (/\d/.test(name.value)) {
+        err.textContent = "Имя не должно содержать цифры";
+        err.classList.remove("hide");
+        valid = false;
+      }
+
+      if (name.value.length < 2) {
+        err.textContent = "Минимальная длина имени - 2 символа";
+        err.classList.remove("hide");
+        valid = false;
+      }
+
+      if (!/\d/.test(name.value) && name.value.length >= 2) {
+        valid = true;
+      }
+      if (valid) {
         postData(item);
-        // setTimeout(item.submit, 2000);
       }
     });
   });
 
-  $("input[name=phone]").mask("+38 (999) 999-99-99");
-
-  function validation(form) {
-    let error = 0;
-    const field = form.querySelectorAll(".modal__input");
-
-    for (let i = 0; i < field.length; i++) {
-      const input = field[i];
-      removeValidationError(input);
-
-      if (input.classList.contains("name")) {
-        if (input.value.trim().length < 2 || /\d/.test(input.value)) {
-          getValidationError(
-            input,
-            "Имя пользователя слишком короткое или содержит цифры"
-          );
-          error++;
-        } else {
-          removeValidationError(input);
-        }
-      }
-      if (input.classList.contains("phone")) {
-        if (
-          input.value.trim().length < 10 ||
-          input.value.trim().length > 13 ||
-          /[A-Z]/i.test(input.value)
-        ) {
-          getValidationError(input, "Телефон введен в некорректном формате");
-          error++;
-        }
-      }
-      return error;
-    }
-  }
-
-  function getValidationError(input, message) {
-    input.classList.add("invalid");
-
-    if (isErrorValidationMessage === false) {
-      err.textContent = message;
-      err.style.color = "red";
-      input.after(err);
-    } else {
-      err.remove();
-    }
-    isErrorValidationMessage = true;
-  }
-  function removeValidationError(input) {
-    input.classList.remove("invalid");
-  }
-
   //Функция для отправки формы
   function postData(form) {
     form.addEventListener("submit", (e) => {
-      e.preventDefault();
+      // e.preventDefault();
 
       let statusMessage = document.createElement("img");
       statusMessage.src = message.loading;

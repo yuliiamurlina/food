@@ -132,7 +132,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   //Вызов модального окна при прокрутке страницы
-  const modalTimerId = setTimeout(openModal, 5000);
+  const modalTimerId = setTimeout(openModal, 8000);
 
   function showModalByScroll() {
     if (
@@ -188,30 +188,19 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  new Cards(
-    "img/tabs/vegy.jpg",
-    "vegy",
-    'Меню "Фитнес"',
-    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-    7,
-    ".menu__field .container"
-  ).render();
-  new Cards(
-    "img/tabs/elite.jpg",
-    "meal",
-    "Меню “Премиум”",
-    "В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!",
-    15,
-    ".menu__field .container"
-  ).render();
-  new Cards(
-    "img/tabs/post.jpg",
-    "meat",
-    'Меню "Постное"',
-    "Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.",
-    9,
-    ".menu__field .container"
-  ).render();
+  const getData = async (url) => {
+    const result = await fetch(url);
+    if (!result.ok) {
+      throw new Error(`Could not fetch ${url}, status: ${result.status}`);
+    }
+    return await result.json();
+  };
+
+  getData("http://localhost:3000/menu").then((data) => {
+    data.forEach(({ img, altimg, title, descr, price }) => {
+      new Cards(img, altimg, title, descr, price, ".menu .container").render();
+    });
+  });
 
   //Form
 
@@ -247,13 +236,25 @@ window.addEventListener("DOMContentLoaded", () => {
         valid = false;
       }
       if (valid) {
-        postData(item);
+        bindpostData(item);
       }
     });
   });
 
   //Функция для отправки формы
-  function postData(form) {
+
+  const postData = async (url, data) => {
+    const result = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: data,
+    });
+    return await result.json();
+  };
+
+  function bindpostData(form) {
     let statusMessage = document.createElement("img");
     statusMessage.src = message.loading;
     statusMessage.style.cssText = `
@@ -262,28 +263,23 @@ window.addEventListener("DOMContentLoaded", () => {
       `;
     form.insertAdjacentElement("afterend", statusMessage);
 
-    const request = new XMLHttpRequest();
-    request.open("POST", "../server.php");
-    request.setRequestHeader("Content-type", "application/json; charset=utf-8");
     const formData = new FormData(form);
 
-    const object = {};
-    formData.forEach(function (value, key) {
-      object[key] = value;
-    });
-    request.send(JSON.stringify(object));
+    const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-    request.addEventListener("load", () => {
-      if (request.status === 200) {
-        console.log(request.response);
+    postData("http://localhost:3000/requests", json)
+      .then((data) => {
+        console.log(data);
 
         statusMessage.remove();
-        form.reset();
         showThanksModal(message.success);
-      } else {
+      })
+      .catch(() => {
         showThanksModal(message.fail);
-      }
-    });
+      })
+      .finally(() => {
+        form.reset();
+      });
   }
 
   function showThanksModal(message) {

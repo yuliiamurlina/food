@@ -167,8 +167,14 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     return await result.json();
   };
-  getData("http://localhost:3000/menu").then(data => {
-    data.forEach(({
+
+  // getData("http://localhost:3000/menu").then((data) => {
+  //   data.forEach(({ img, altimg, title, descr, price }) => {
+  //     new Cards(img, altimg, title, descr, price, ".menu .container").render();
+  //   });
+  // });
+  axios.get("http://localhost:3000/menu").then(data => {
+    data.data.forEach(({
       img,
       altimg,
       title,
@@ -264,6 +270,44 @@ window.addEventListener("DOMContentLoaded", () => {
       closeModal();
     }, 2000);
   }
+
+  //Slider
+
+  const slider = document.querySelector(".offer__slider"),
+    prevButton = slider.querySelector(".offer__slider-prev"),
+    nextButton = slider.querySelector(".offer__slider-next"),
+    slides = slider.querySelectorAll(".offer__slide"),
+    total = slider.querySelector("#total"),
+    current = slider.querySelector("#current");
+  let slideIndex = 1;
+  if (slides.length < 10) {
+    total.textContent = `0${slides.length}`;
+  } else {
+    total.textContent = slides.length;
+  }
+  showSlide(slideIndex);
+  function showSlide(n) {
+    if (n > slides.length) {
+      slideIndex = 1;
+    }
+    if (n < 1) {
+      slideIndex = slides.length;
+    }
+    slides.forEach(item => {
+      item.style.display = "none";
+    });
+    slides[slideIndex - 1].style.display = "block";
+    if (slideIndex < 10) {
+      current.textContent = `0${slideIndex}`;
+    } else {
+      current.textContent = slideIndex;
+    }
+  }
+  function plusSlide(n) {
+    showSlide(slideIndex += n);
+  }
+  prevButton.addEventListener("click", () => plusSlide(-1));
+  nextButton.addEventListener("click", () => plusSlide(1));
 });
 /******/ })()
 ;

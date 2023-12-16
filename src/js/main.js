@@ -246,8 +246,6 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  //Функция для отправки формы
-
   const postData = async (url, data) => {
     const result = await fetch(url, {
       method: "POST",
@@ -259,13 +257,23 @@ window.addEventListener("DOMContentLoaded", () => {
     return await result.json();
   };
 
+  async function getResource(url) {
+    let res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    }
+
+    return await res.json();
+  }
+
   function bindpostData(form) {
     let statusMessage = document.createElement("img");
     statusMessage.src = message.loading;
     statusMessage.style.cssText = `
-        display: block;
-        margin: 0 auto;
-      `;
+              display: block;
+              margin: 0 auto;
+            `;
     form.insertAdjacentElement("afterend", statusMessage);
 
     const formData = new FormData(form);
@@ -308,8 +316,9 @@ window.addEventListener("DOMContentLoaded", () => {
       prevModalDialog.classList.add("show");
       prevModalDialog.classList.remove("hide");
       closeModal();
-    }, 2000);
+    }, 4000);
   }
+  // */
 
   //Slider
 

@@ -14,13 +14,10 @@ module.exports = {
   devtool: "source-map",
 
   module: {},
-  node: {
-    fs: "empty",
-  },
-  resolve: {
-    fallback: {
-      fs: require.resolve("browserify-fs"),
-      path: require.resolve("path-browserify"),
-    },
-  },
+
+  // node: {
+  //   fs: "empty",
+  //   module: "empty",
+  //   net: "empty",
+  // },
 };

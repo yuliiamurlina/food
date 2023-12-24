@@ -217,7 +217,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const forms = document.querySelectorAll("form"),
     message = {
-      success: "Спасибо! Скоро мы с вами свяжемся",
+      success: "Спасибо! Скоро мы с вами свяжемся!",
       fail: "Произошла ошибка",
       loading: "img/spinner.svg",
     };
@@ -225,29 +225,24 @@ window.addEventListener("DOMContentLoaded", () => {
   $("input[name=phone]").mask("+38 (999) 999-99-99");
 
   forms.forEach((item) => {
-    item.addEventListener("submit", (event) => {
-      event.preventDefault();
-
+    const input = document.querySelector(".form-name");
+    input.addEventListener("input", (event) => {
       let valid = true;
-      const name = item.querySelector(".name"),
-        err = item.querySelector(".name_error");
-
+      const err = item.querySelector(".name_error");
       err.style.color = "red";
-      err.classList.add("hide");
 
-      if (/\d/.test(name.value)) {
+      if (/\d/.test(input.value)) {
         err.textContent = "Имя не должно содержать цифры";
-        err.classList.remove("hide");
         valid = false;
       }
 
-      if (name.value.length < 2) {
+      if (input.value.length < 2) {
         err.textContent = "Минимальная длина имени - 2 символа";
-        err.classList.remove("hide");
         valid = false;
       }
       if (valid) {
-        bindpostData(item);
+        err.classList.add("hide");
+        bindPostData(item);
       }
     });
   });
@@ -273,57 +268,60 @@ window.addEventListener("DOMContentLoaded", () => {
     return await res.json();
   }
 
-  function bindpostData(form) {
-    let statusMessage = document.createElement("img");
-    statusMessage.src = message.loading;
-    statusMessage.style.cssText = `
-              display: block;
-              margin: 0 auto;
+  function bindPostData(form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      let statusMessage = document.createElement("img");
+      statusMessage.src = message.loading;
+      statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto;
             `;
-    form.insertAdjacentElement("afterend", statusMessage);
+      form.insertAdjacentElement("afterend", statusMessage);
 
-    const formData = new FormData(form);
+      const formData = new FormData(form);
 
-    const json = JSON.stringify(Object.fromEntries(formData.entries()));
+      const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-    postData("http://localhost:3000/requests", json)
-      .then((data) => {
-        console.log(data);
-
-        statusMessage.remove();
-        showThanksModal(message.success);
-      })
-      .catch(() => {
-        showThanksModal(message.fail);
-      })
-      .finally(() => {
-        form.reset();
-      });
+      postData("http://localhost:3000/requests", json)
+        .then((data) => {
+          console.log(data);
+          showThanksModal(message.success);
+          statusMessage.remove();
+        })
+        .catch(() => {
+          showThanksModal(message.failure);
+        })
+        .finally(() => {
+          form.reset();
+        });
+    });
   }
 
   function showThanksModal(message) {
-    const prevModalDialog = document.querySelector(".modal__dialog"),
-      thanks = document.querySelector(".thanks");
+    const prevModalDialog = document.querySelector(".modal__dialog");
+
     prevModalDialog.classList.add("hide");
+    openModal();
 
-    thanks.innerHTML = `
-      <div class="modal__content">
-          <div class="modal__close" data-modalclose>×</div>
-          <div class="modal__title">${message}</div>
-      </div>
-    `;
-
-    thanks.classList.add("show", "fade");
-    thanks.classList.remove("hide");
-
+    const thanksModal = document.createElement("div");
+    thanksModal.classList.add("modal__dialog");
+    thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>×</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `;
+    document.querySelector(".modal").append(thanksModal);
     setTimeout(() => {
-      thanks.classList.add("hide");
-      thanks.classList.remove("fade", "show");
+      thanksModal.remove();
       prevModalDialog.classList.add("show");
       prevModalDialog.classList.remove("hide");
       closeModal();
     }, 4000);
   }
+
   // */
 
   //Slider

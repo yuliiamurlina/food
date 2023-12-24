@@ -14,10 +14,4 @@ module.exports = {
   devtool: "source-map",
 
   module: {},
-
-  // node: {
-  //   fs: "empty",
-  //   module: "empty",
-  //   net: "empty",
-  // },
 };

@@ -1,9 +1,7 @@
-function timer() {
-  const deadline = "2023-12-31T23:59";
-
+function timer(id, deadline) {
   getTimeRemaining(deadline);
 
-  setClock(".timer", deadline);
+  setClock(id, deadline);
 
   function getTimeRemaining(endtime) {
     const t = Date.parse(endtime) - Date.parse(new Date());

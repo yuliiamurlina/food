@@ -1,4 +1,5 @@
 import { openModal, closeModal } from "./modal";
+import { postData } from "../services/services";
 
 function form(modalTimerId) {
   const forms = document.querySelectorAll("form"),
@@ -22,10 +23,10 @@ function form(modalTimerId) {
         valid = false;
       }
 
-      if (input.value.length <= 1) {
-        err.textContent = "Минимальная длина имени - 2 символа";
-        valid = false;
-      }
+      // if (input.value.length <= 1) {
+      //   err.textContent = "Минимальная длина имени - 2 символа";
+      //   valid = false;
+      // }
 
       if (valid) {
         err.classList.add("hide");
@@ -33,17 +34,6 @@ function form(modalTimerId) {
       }
     });
   });
-
-  const postData = async (url, data) => {
-    const result = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: data,
-    });
-    return await result.json();
-  };
 
   async function getResource(url) {
     let res = await fetch(url);
